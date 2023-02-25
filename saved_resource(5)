@@ -1,0 +1,646 @@
+( function ( g ) {
+
+  var t = {
+      PLATFORM_WINDOWS: 'windows',
+      PLATFORM_IPHONE: 'iphone',
+      PLATFORM_IPOD: 'ipod',
+      PLATFORM_IPAD: 'ipad',
+      PLATFORM_BLACKBERRY: 'blackberry',
+      PLATFORM_BLACKBERRY_10: 'blackberry_10',
+      PLATFORM_SYMBIAN: 'symbian_series60',
+      PLATFORM_SYMBIAN_S40: 'symbian_series40',
+      PLATFORM_J2ME_MIDP: 'j2me_midp',
+      PLATFORM_ANDROID: 'android',
+      PLATFORM_ANDROID_TABLET: 'android_tablet',
+      PLATFORM_FIREFOX_OS: 'firefoxOS',
+      PLATFORM_MOBILE_GENERIC: 'mobile_generic',
+
+      userAgent : false, // Shortcut to the browser User Agent String.
+      matchedPlatformName : false, // Matched platform name. False otherwise.
+      matchedUserAgentName : false, // Matched UA String. False otherwise.
+
+      init: function() {
+        try {
+          t.userAgent = g.navigator.userAgent.toLowerCase();
+          t.getPlatformName();
+          t.getMobileUserAgentName();
+        }	catch ( e ) {
+          console.error( e );
+        }
+      },
+
+      initForTest: function( userAgent ) {
+        t.matchedPlatformName = false;
+        t.matchedUserAgentName = false;
+        try {
+          t.userAgent = userAgent.toLowerCase();
+          t.getPlatformName();
+          t.getMobileUserAgentName();
+        }	catch ( e ) {
+          console.error( e );
+        }
+      },
+
+      /**
+       * This method detects the mobile User Agent name.
+       */
+      getMobileUserAgentName: function() {
+        if ( t.matchedUserAgentName !== false )
+          return t.matchedUserAgentName;
+
+        if ( t.userAgent === false )
+          return false;
+
+        if ( t.isChromeForIOS() )
+          t.matchedUserAgentName = 'chrome-for-ios';
+        else if ( t.isTwitterForIpad() )
+          t.matchedUserAgentName =  'twitter-for-ipad';
+        else if ( t.isTwitterForIphone() )
+          t.matchedUserAgentName =  'twitter-for-iphone';
+        else if ( t.isIPhoneOrIPod() )
+          t.matchedUserAgentName = 'iphone';
+        else if ( t.isIPad() )
+          t.matchedUserAgentName = 'ipad';
+        else if ( t.isAndroidTablet() )
+          t.matchedUserAgentName = 'android_tablet';
+        else if ( t.isAndroid() )
+          t.matchedUserAgentName = 'android';
+        else if ( t.isBlackberry10() )
+          t.matchedUserAgentName = 'blackberry_10';
+        else if ( has( 'blackberry' ) )
+          t.matchedUserAgentName = 'blackberry';
+        else if ( t.isBlackberryTablet() )
+          t.matchedUserAgentName = 'blackberry_tablet';
+        else if ( t.isWindowsPhone7() )
+          t.matchedUserAgentName = 'win7';
+        else if ( t.isWindowsPhone8() )
+          t.matchedUserAgentName = 'winphone8';
+        else if ( t.isOperaMini() )
+          t.matchedUserAgentName = 'opera-mini';
+        else if ( t.isOperaMobile() )
+          t.matchedUserAgentName = 'opera-mobi';
+        else if ( t.isKindleFire() )
+          t.matchedUserAgentName = 'kindle-fire';
+        else if ( t.isSymbianPlatform() )
+          t.matchedUserAgentName = 'series60';
+        else if ( t.isFirefoxMobile() )
+          t.matchedUserAgentName = 'firefox_mobile';
+        else if ( t.isFirefoxOS() )
+          t.matchedUserAgentName = 'firefoxOS';
+        else if ( t.isFacebookForIphone() )
+          t.matchedUserAgentName = 'facebook-for-iphone';
+        else if ( t.isFacebookForIpad() )
+          t.matchedUserAgentName = 'facebook-for-ipad';
+        else if ( t.isWordPressForIos() )
+          t.matchedUserAgentName = 'ios-app';
+        else if ( has( 'iphone' ) )
+          t.matchedUserAgentName = 'iphone-unknown';
+        else if ( has( 'ipad' ) )
+          t.matchedUserAgentName = 'ipad-unknown';
+
+        return t.matchedUserAgentName;
+      },
+
+      /**
+       * This method detects the mobile platform name.
+       */
+      getPlatformName : function() {
+        if ( t.matchedPlatformName !== false )
+          return t.matchedPlatformName;
+
+        if ( t.userAgent === false )
+          return false;
+
+        if ( has( 'windows ce' ) || has( 'windows phone' ) ) {
+          t.matchedPlatformName = t.PLATFORM_WINDOWS;
+        } else if ( has( 'ipad' ) ) {
+          t.matchedPlatformName = t.PLATFORM_IPAD;
+        } else if ( has( 'ipod' ) ) {
+          t.matchedPlatformName = t.PLATFORM_IPOD;
+        } else if ( has( 'iphone' ) ) {
+          t.matchedPlatformName = t.PLATFORM_IPHONE;
+        } else if ( has( 'android' ) ) {
+          if ( t.isAndroidTablet() )
+            t.matchedPlatformName = t.PLATFORM_ANDROID_TABLET;
+          else
+            t.matchedPlatformName = t.PLATFORM_ANDROID;
+        } else if ( t.isKindleFire() ) {
+          t.matchedPlatformName = t.PLATFORM_ANDROID_TABLET;
+        } else if ( t.isBlackberry10() ) {
+          t.matchedPlatformName = t.PLATFORM_BLACKBERRY_10;
+        } else if ( has( 'blackberry' ) ) {
+          t.matchedPlatformName = t.PLATFORM_BLACKBERRY;
+        } else if ( t.isBlackberryTablet() ) {
+          t.matchedPlatformName = t.PLATFORM_BLACKBERRY;
+        } else if ( t.isSymbianPlatform() ) {
+          t.matchedPlatformName = t.PLATFORM_SYMBIAN;
+        } else if ( t.isSymbianS40Platform() ) {
+          t.matchedPlatformName = t.PLATFORM_SYMBIAN_S40;
+        } else if ( t.isJ2MEPlatform() ) {
+          t.matchedPlatformName = t.PLATFORM_J2ME_MIDP;
+        } else if ( t.isFirefoxOS() ) {
+          t.matchedPlatformName = t.PLATFORM_FIREFOX_OS;
+        } else if ( t.isFirefoxMobile() ) {
+          t.matchedPlatformName = t.PLATFORM_MOBILE_GENERIC;
+        }
+
+        return t.matchedPlatformName;
+      },
+
+
+      /**
+       * Detect the BlackBerry OS version.
+       *
+       * Note: This is for smartphones only. Does not work on BB tablets.
+       */
+      getBlackBerryOSVersion : check( function() {
+        if ( t.isBlackberry10() )
+          return '10';
+
+        if ( ! has( 'blackberry' ) )
+          return false;
+
+        var rv = -1; // Return value assumes failure.
+        var re;
+
+        if ( has( 'webkit' ) ) { // Detecting the BB OS version for devices running OS 6.0 or higher
+          re = /Version\/([\d\.]+)/i;
+        } else {
+          // BlackBerry devices <= 5.XX
+          re = /BlackBerry\w+\/([\d\.]+)/i;
+        }
+        if ( re.exec( t.userAgent ) != null )
+          rv =  RegExp.$1.toString();
+
+        return rv === -1 ? false : rv;
+      } ),
+
+      /**
+       * Detects if the current UA is iPhone Mobile Safari or another iPhone or iPod Touch Browser.
+       */
+      isIPhoneOrIPod : check( function() {
+        return has( 'safari' ) && ( has( 'iphone' ) || has( 'ipod' ) );
+      } ),
+
+      /**
+       * Detects if the current device is an iPad.
+       */
+      isIPad : check( function() {
+        return has( 'ipad' ) && has( 'safari' );
+      } ),
+
+
+      /**
+      *  Detects if the current UA is Chrome for iOS
+      */
+      isChromeForIOS : check( function() {
+        return t.isIPhoneOrIPod() && has( 'crios/' );
+      } ),
+
+      /**
+       * Detects if the current browser is the Native Android browser.
+       */
+      isAndroid : check( function() {
+        if ( has( 'android' ) ) {
+          return ! ( t.isOperaMini() || t.isOperaMobile() || t.isFirefoxMobile() );
+        }
+      } ),
+
+      /**
+       * Detects if the current browser is the Native Android Tablet browser.
+       */
+       isAndroidTablet : check( function() {
+        if ( has( 'android' ) && ! has( 'mobile' ) ) {
+          return ! ( t.isOperaMini() || t.isOperaMobile() || t.isFirefoxMobile() );
+        }
+      } ),
+
+
+      /**
+       * Detects if the current browser is Opera Mobile
+       */
+      isOperaMobile : check( function() {
+        return has( 'opera' ) && has( 'mobi' );
+      } ),
+
+      /**
+       * Detects if the current browser is Opera Mini
+       */
+      isOperaMini : check( function() {
+        return has( 'opera' ) && has( 'mini' );
+      } ),
+
+
+      /**
+       * isBlackberry10() can be used to check the User Agent for a BlackBerry 10 device.
+       */
+      isBlackberry10 : check( function() {
+        return has( 'bb10' ) && has( 'mobile' );
+      } ),
+
+      /**
+       * isBlackberryTablet() can be used to check the User Agent for a RIM blackberry tablet
+       */
+      isBlackberryTablet : check( function() {
+        return has( 'playbook' ) && has( 'rim tablet' );
+      } ),
+
+      /**
+       * Detects if the current browser is a Windows Phone 7 device.
+       */
+      isWindowsPhone7 : check( function () {
+        return has( 'windows phone os 7' );
+      } ),
+
+      /**
+       * Detects if the current browser is a Windows Phone 8 device.
+       */
+      isWindowsPhone8 : check( function () {
+        return has( 'windows phone 8' );
+      } ),
+
+      /**
+       * Detects if the device platform is J2ME.
+       */
+      isJ2MEPlatform : check( function () {
+        return has( 'j2me/midp' ) || ( has( 'midp' ) && has( 'cldc' ) );
+      } ),
+
+
+      /**
+       * Detects if the device platform is the Symbian Series 40.
+       */
+      isSymbianS40Platform : check( function() {
+        if ( has( 'series40' ) ) {
+          return has( 'nokia' ) || has( 'ovibrowser' ) || has( 'nokiabrowser' );
+        }
+      } ),
+
+
+      /**
+       * Detects if the device platform is the Symbian Series 60.
+       */
+      isSymbianPlatform : check( function() {
+        if ( has( 'webkit' ) ) {
+          // First, test for WebKit, then make sure it's either Symbian or S60.
+          return has( 'symbian' ) || has( 'series60' );
+        } else if ( has( 'symbianos' ) && has( 'series60' ) ) {
+          return true;
+        } else if ( has( 'nokia' ) && has( 'series60' ) ) {
+          return true;
+        } else if ( has( 'opera mini' ) ) {
+          return has( 'symbianos' ) || has( 'symbos' ) || has( 'series 60' );
+        }
+      } ),
+
+
+      /**
+       * Detects if the current browser is the Kindle Fire Native browser.
+       */
+      isKindleFire : check( function() {
+        return has( 'silk/' ) && has( 'silk-accelerated=' );
+      } ),
+
+      /**
+       * Detects if the current browser is Firefox Mobile (Fennec)
+       */
+      isFirefoxMobile : check( function() {
+        return has( 'fennec' );
+      } ),
+
+
+      /**
+       * Detects if the current browser is the native FirefoxOS browser
+       */
+      isFirefoxOS : check( function() {
+        return has( 'mozilla' ) && has( 'mobile' ) && has( 'gecko' ) && has( 'firefox' );
+      } ),
+
+
+      /**
+       * Detects if the current UA is Facebook for iPad
+       */
+      isFacebookForIpad : check( function() {
+        if ( ! has( 'ipad' ) )
+          return false;
+
+        return has( 'facebook' ) || has( 'fbforiphone' ) || has( 'fban/fbios;' );
+      } ),
+
+      /**
+       * Detects if the current UA is Facebook for iPhone
+       */
+      isFacebookForIphone : check( function() {
+        if ( ! has( 'iphone' ) )
+          return false;
+
+        return ( has( 'facebook' ) && ! has( 'ipad' ) ) ||
+          ( has( 'fbforiphone' ) && ! has( 'tablet' ) ) ||
+          ( has( 'fban/fbios;' ) && ! has( 'tablet' ) ); // FB app v5.0 or higher
+      } ),
+
+      /**
+       * Detects if the current UA is Twitter for iPhone
+       */
+      isTwitterForIphone : check( function() {
+        if ( has( 'ipad' ) )
+          return false;
+
+        return has( 'twitter for iphone' );
+      } ),
+
+      /**
+       * Detects if the current UA is Twitter for iPad
+       */
+      isTwitterForIpad : check( function() {
+        return has( 'twitter for ipad' ) || ( has( 'ipad' ) && has( 'twitter for iphone' ) );
+      } ),
+
+
+      /**
+       * Detects if the current UA is WordPress for iOS
+       */
+      isWordPressForIos : check( function() {
+        return has( 'wp-iphone' );
+      } )
+  };
+
+  function has( str ) {
+    return t.userAgent.indexOf( str ) != -1;
+  }
+
+  function check( fn ) {
+    return function() {
+      return t.userAgent === false ? false : fn() || false;
+    }
+  }
+
+  g.wpcom_mobile_user_agent_info = t;
+
+} )( typeof window !== 'undefined' ? window : this );
+;
+!function(){function e(e){e.querySelectorAll('[aria-expanded="true"]').forEach((function(e){e.setAttribute("aria-expanded","false")}))}function t(t){const n=t.target.closest("[aria-expanded]");if("true"===n.getAttribute("aria-expanded"))e(n.closest(".wp-block-navigation-item"));else{const t=n.closest(".wp-block-navigation-item");n.closest(".wp-block-navigation__submenu-container, .wp-block-navigation__container, .wp-block-page-list").querySelectorAll(".wp-block-navigation-item").forEach((function(n){n!==t&&e(n)})),n.setAttribute("aria-expanded","true")}}window.addEventListener("load",(()=>{document.querySelectorAll(".wp-block-navigation-submenu__toggle").forEach((function(e){e.addEventListener("click",t)})),document.addEventListener("click",(function(t){document.querySelectorAll(".wp-block-navigation").forEach((function(n){n.contains(t.target)||e(n)}))})),document.addEventListener("keyup",(function(t){document.querySelectorAll(".wp-block-navigation-item.has-child").forEach((function(n){if(n.contains(t.target)){if("Escape"===t.key){const t=n.querySelector('[aria-expanded="true"]');e(n),null==t||t.focus()}}else e(n)}))}))}))}();
+//# sourceMappingURL=view.min.js.map;
+!function(){"use strict";function e(e){return function(e){if(Array.isArray(e))return t(e)}(e)||function(e){if("undefined"!=typeof Symbol&&Symbol.iterator in Object(e))return Array.from(e)}(e)||function(e,o){if(e){if("string"==typeof e)return t(e,o);var n=Object.prototype.toString.call(e).slice(8,-1);return"Object"===n&&e.constructor&&(n=e.constructor.name),"Map"===n||"Set"===n?Array.from(e):"Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)?t(e,o):void 0}}(e)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function t(e,t){(null==t||t>e.length)&&(t=e.length);for(var o=0,n=new Array(t);o<t;o++)n[o]=e[o];return n}var o,n,i,a,r,s=(o=["a[href]","area[href]",'input:not([disabled]):not([type="hidden"]):not([aria-hidden])',"select:not([disabled]):not([aria-hidden])","textarea:not([disabled]):not([aria-hidden])","button:not([disabled]):not([aria-hidden])","iframe","object","embed","[contenteditable]",'[tabindex]:not([tabindex^="-"])'],n=function(){function t(o){var n=o.targetModal,i=o.triggers,a=void 0===i?[]:i,r=o.onShow,s=void 0===r?function(){}:r,l=o.onClose,c=void 0===l?function(){}:l,d=o.openTrigger,u=void 0===d?"data-micromodal-trigger":d,h=o.closeTrigger,f=void 0===h?"data-micromodal-close":h,v=o.openClass,g=void 0===v?"is-open":v,m=o.disableScroll,b=void 0!==m&&m,y=o.disableFocus,w=void 0!==y&&y,p=o.awaitCloseAnimation,k=void 0!==p&&p,E=o.awaitOpenAnimation,A=void 0!==E&&E,C=o.debugMode,L=void 0!==C&&C;!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,t),this.modal=document.getElementById(n),this.config={debugMode:L,disableScroll:b,openTrigger:u,closeTrigger:f,openClass:g,onShow:s,onClose:c,awaitCloseAnimation:k,awaitOpenAnimation:A,disableFocus:w},a.length>0&&this.registerTriggers.apply(this,e(a)),this.onClick=this.onClick.bind(this),this.onKeydown=this.onKeydown.bind(this)}var n;return(n=[{key:"registerTriggers",value:function(){for(var e=this,t=arguments.length,o=new Array(t),n=0;n<t;n++)o[n]=arguments[n];o.filter(Boolean).forEach((function(t){t.addEventListener("click",(function(t){return e.showModal(t)}))}))}},{key:"showModal",value:function(){var e=this,t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:null;if(this.activeElement=document.activeElement,this.modal.setAttribute("aria-hidden","false"),this.modal.classList.add(this.config.openClass),this.scrollBehaviour("disable"),this.addEventListeners(),this.config.awaitOpenAnimation){var o=function t(){e.modal.removeEventListener("animationend",t,!1),e.setFocusToFirstNode()};this.modal.addEventListener("animationend",o,!1)}else this.setFocusToFirstNode();this.config.onShow(this.modal,this.activeElement,t)}},{key:"closeModal",value:function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:null,t=this.modal;if(this.modal.setAttribute("aria-hidden","true"),this.removeEventListeners(),this.scrollBehaviour("enable"),this.activeElement&&this.activeElement.focus&&this.activeElement.focus(),this.config.onClose(this.modal,this.activeElement,e),this.config.awaitCloseAnimation){var o=this.config.openClass;this.modal.addEventListener("animationend",(function e(){t.classList.remove(o),t.removeEventListener("animationend",e,!1)}),!1)}else t.classList.remove(this.config.openClass)}},{key:"closeModalById",value:function(e){this.modal=document.getElementById(e),this.modal&&this.closeModal()}},{key:"scrollBehaviour",value:function(e){if(this.config.disableScroll){var t=document.querySelector("body");switch(e){case"enable":Object.assign(t.style,{overflow:""});break;case"disable":Object.assign(t.style,{overflow:"hidden"})}}}},{key:"addEventListeners",value:function(){this.modal.addEventListener("touchstart",this.onClick),this.modal.addEventListener("click",this.onClick),document.addEventListener("keydown",this.onKeydown)}},{key:"removeEventListeners",value:function(){this.modal.removeEventListener("touchstart",this.onClick),this.modal.removeEventListener("click",this.onClick),document.removeEventListener("keydown",this.onKeydown)}},{key:"onClick",value:function(e){(e.target.hasAttribute(this.config.closeTrigger)||e.target.parentNode.hasAttribute(this.config.closeTrigger))&&(e.preventDefault(),e.stopPropagation(),this.closeModal(e))}},{key:"onKeydown",value:function(e){27===e.keyCode&&this.closeModal(e),9===e.keyCode&&this.retainFocus(e)}},{key:"getFocusableNodes",value:function(){var t=this.modal.querySelectorAll(o);return Array.apply(void 0,e(t))}},{key:"setFocusToFirstNode",value:function(){var e=this;if(!this.config.disableFocus){var t=this.getFocusableNodes();if(0!==t.length){var o=t.filter((function(t){return!t.hasAttribute(e.config.closeTrigger)}));o.length>0&&o[0].focus(),0===o.length&&t[0].focus()}}}},{key:"retainFocus",value:function(e){var t=this.getFocusableNodes();if(0!==t.length)if(t=t.filter((function(e){return null!==e.offsetParent})),this.modal.contains(document.activeElement)){var o=t.indexOf(document.activeElement);e.shiftKey&&0===o&&(t[t.length-1].focus(),e.preventDefault()),!e.shiftKey&&t.length>0&&o===t.length-1&&(t[0].focus(),e.preventDefault())}else t[0].focus()}}])&&function(e,t){for(var o=0;o<t.length;o++){var n=t[o];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}(t.prototype,n),t}(),i=null,a=function(e){if(!document.getElementById(e))return console.warn("MicroModal: ❗Seems like you have missed %c'".concat(e,"'"),"background-color: #f8f9fa;color: #50596c;font-weight: bold;","ID somewhere in your code. Refer example below to resolve it."),console.warn("%cExample:","background-color: #f8f9fa;color: #50596c;font-weight: bold;",'<div class="modal" id="'.concat(e,'"></div>')),!1},r=function(e,t){if(function(e){e.length<=0&&(console.warn("MicroModal: ❗Please specify at least one %c'micromodal-trigger'","background-color: #f8f9fa;color: #50596c;font-weight: bold;","data attribute."),console.warn("%cExample:","background-color: #f8f9fa;color: #50596c;font-weight: bold;",'<a href="#" data-micromodal-trigger="my-modal"></a>'))}(e),!t)return!0;for(var o in t)a(o);return!0},{init:function(t){var o=Object.assign({},{openTrigger:"data-micromodal-trigger"},t),a=e(document.querySelectorAll("[".concat(o.openTrigger,"]"))),s=function(e,t){var o=[];return e.forEach((function(e){var n=e.attributes[t].value;void 0===o[n]&&(o[n]=[]),o[n].push(e)})),o}(a,o.openTrigger);if(!0!==o.debugMode||!1!==r(a,s))for(var l in s){var c=s[l];o.targetModal=l,o.triggers=e(c),i=new n(o)}},show:function(e,t){var o=t||{};o.targetModal=e,!0===o.debugMode&&!1===a(e)||(i&&i.removeEventListeners(),(i=new n(o)).showModal())},close:function(e){e?i.closeModalById(e):i.closeModal()}});"undefined"!=typeof window&&(window.MicroModal=s);var l=s;function c(e){const t=e.querySelector(".wp-block-navigation__responsive-dialog"),o="true"===e.getAttribute("aria-hidden");e.classList.toggle("has-modal-open",!o),t.toggleAttribute("aria-modal",!o),o?(t.removeAttribute("role"),t.removeAttribute("aria-modal")):(t.setAttribute("role","dialog"),t.setAttribute("aria-modal","true")),document.documentElement.classList.toggle("has-modal-open")}window.addEventListener("load",(()=>{l.init({onShow:c,onClose:c,openClass:"is-menu-open"}),document.querySelectorAll(".wp-block-navigation-item__content").forEach((function(e){var t,o;if(!(o=e).hash||o.protocol!==window.location.protocol||o.host!==window.location.host||o.pathname!==window.location.pathname||o.search!==window.location.search||"_blank"===(null===(t=e.attributes)||void 0===t?void 0:t.target))return;const n=e.closest(".wp-block-navigation__responsive-container"),i=null==n?void 0:n.getAttribute("id");e.addEventListener("click",(()=>{i&&n.classList.contains("has-modal-open")&&l.close(i)}))}))}))}();
+//# sourceMappingURL=view-modal.min.js.map;
+// listen for rlt authentication events and pass them to children of this document.
+( function() {
+	var currentToken;
+	var parentOrigin;
+	var iframeOrigins;
+	var initializationListeners = [];
+	var hasBeenInitialized = false;
+	var RLT_KEY = 'jetpack:wpcomRLT';
+
+	// IE11 compat version that doesn't require on `new URL( src )`
+	function getOriginFromUrl( url ) {
+		var parser = document.createElement('a');
+		parser.href = url;
+		return parser.origin;
+	}
+
+	// run on `load` for suitable iframes, this injects the current token if available
+	function rltIframeInjector( event ) {
+		if ( ! currentToken ) {
+			return;
+		}
+		rltInjectToken( currentToken, event.target.contentWindow, getOriginFromUrl( event.target.src ) );
+	}
+
+	// run on DOMContentLoaded or later
+	function rltMonitorIframes() {
+		// wait until suitable iframes are loaded before trying to inject the RLT
+		var iframes = document.querySelectorAll( "iframe" );
+		for( var i=0; i<iframes.length; i++ ) {
+			var iframe = iframes[i];
+			if ( rltShouldAuthorizeIframe( iframe ) ) {
+				iframe.addEventListener('load', rltIframeInjector);
+			}
+		}
+
+		// listen for newly-created iframes, since some are injected dynamically
+		var observer = new MutationObserver(function( mutationsList, observer ) {
+			for(var i=0; i<mutationsList.length; i++) {
+				var mutation = mutationsList[i];
+				if (mutation.type === 'childList') {
+					for(var j=0; j<mutation.addedNodes.length; j++) {
+						var node = mutation.addedNodes[j];
+						if (node instanceof HTMLElement && node.nodeName === 'IFRAME' && rltShouldAuthorizeIframe(node)) {
+							node.addEventListener('load', rltIframeInjector);
+						}
+					}
+				}
+			}
+		});
+
+		observer.observe(document.body, { subtree: true, childList: true });
+	}
+
+	// should we inject RLT into this iframe?
+	function rltShouldAuthorizeIframe( iframe ) {
+		if ( ! Array.isArray( iframeOrigins ) ) {
+			return;
+		}
+		return iframeOrigins.indexOf( getOriginFromUrl( iframe.src ) ) >= 0;
+	}
+
+	function rltInvalidateWindowToken( token, target, origin ) {
+		if ( target && typeof target.postMessage === 'function' ) {
+			try {
+				target.postMessage( JSON.stringify( {
+					type: 'rltMessage',
+					data: {
+						event: 'invalidate',
+						token: token,
+						sourceOrigin: window.location.origin,
+					},
+				} ), origin );
+			} catch ( err ) {
+				return;
+			}
+		}
+	}
+
+	/**
+	 * PUBLIC METHODS
+	 */
+	window.rltInvalidateToken = function( token, sourceOrigin ) {
+		// invalidate in current context
+		if ( token === currentToken ) {
+			currentToken = null;
+		}
+
+		// remove from localstorage, but only if in a top level window, not iframe
+		try {
+			if ( window.location === window.parent.location && window.localStorage ) {
+				if ( window.localStorage.getItem(RLT_KEY) === token ) {
+					window.localStorage.removeItem(RLT_KEY);
+				}
+			}
+		} catch( e ) {
+			console.info("localstorage access for invalidate denied - probably blocked third-party access", window.location.href);
+		}
+
+		// invalidate in iframes
+		var iframes = document.querySelectorAll("iframe");
+		for( var i=0; i<iframes.length; i++ ) {
+			var iframe = iframes[i];
+			var iframeOrigin = getOriginFromUrl( iframe.src );
+			if ( iframeOrigin !== sourceOrigin && rltShouldAuthorizeIframe( iframe ) ) {
+				rltInvalidateWindowToken( token, iframe.contentWindow, iframeOrigin );
+			}
+		}
+
+		// invalidate in parent
+		if ( parentOrigin && parentOrigin !== sourceOrigin && window.parent ) {
+			rltInvalidateWindowToken( token, window.parent, parentOrigin );
+		}
+	}
+
+	window.rltInjectToken = function( token, target, origin ) {
+		if ( target && typeof target.postMessage === 'function' ) {
+			try {
+				target.postMessage( JSON.stringify( {
+					type: 'loginMessage',
+					data: {
+						event: 'login',
+						success: true,
+						type: 'rlt',
+						token: token,
+						sourceOrigin: window.location.origin,
+					},
+				} ), origin );
+			} catch ( err ) {
+				return;
+			}
+		}
+	};
+
+	window.rltIsAuthenticated = function() {
+		return !! currentToken;
+	};
+
+	window.rltGetToken = function() {
+		return currentToken;
+	};
+
+	window.rltAddInitializationListener = function( listener ) {
+		// if RLT is already initialized, call the listener immediately
+		if ( hasBeenInitialized ) {
+			listener( currentToken );
+		} else {
+			initializationListeners.push( listener );
+		}
+	};
+
+	// store the token in localStorage
+	window.rltStoreToken = function( token ) {
+		currentToken = token;
+		try {
+			if ( window.location === window.parent.location && window.localStorage ) {
+				window.localStorage.setItem( RLT_KEY, token );
+			}
+		} catch( e ) {
+			console.info("localstorage access denied - probably blocked third-party access", window.location.href);
+		}
+	}
+
+	window.rltInitialize = function( config ) {
+		if ( ! config || typeof window.postMessage !== 'function' ) {
+			return;
+		}
+
+		currentToken  = config.token;
+		iframeOrigins = config.iframeOrigins;
+		parentOrigin  = config.parentOrigin; // needed?
+
+		// load token from localStorage if possible, but only in top level window
+		try {
+			if ( ! currentToken && window.location === window.parent.location && window.localStorage ) {
+				currentToken = window.localStorage.getItem(RLT_KEY);
+			}
+		} catch( e ) {
+			console.info("localstorage access denied - probably blocked third-party access", window.location.href);
+		}
+
+		// listen for RLT events from approved origins
+		window.addEventListener( 'message', function( e ) {
+			var message = e && e.data;
+			if ( typeof message === 'string' ) {
+				try {
+					message = JSON.parse( message );
+				} catch ( err ) {
+					return;
+				}
+			}
+
+			var type = message && message.type;
+			var data = message && message.data;
+
+			if ( type !== 'loginMessage' ) {
+				return;
+			}
+
+			if ( data && data.type === 'rlt' && data.token !== currentToken ) {
+
+				// put into localStorage if running in top-level window (not iframe)
+				rltStoreToken( data.token );
+
+				// send to allowlisted iframes
+				var iframes = document.querySelectorAll("iframe");
+				for( var i=0; i<iframes.length; i++ ) {
+					var iframe = iframes[i];
+					if ( rltShouldAuthorizeIframe( iframe ) ) {
+						rltInjectToken( currentToken, iframe.contentWindow, getOriginFromUrl( iframe.src ) );
+					}
+				}
+
+				// send to the parent, unless the event was sent _by_ the parent
+				if ( parentOrigin && parentOrigin !== data.sourceOrigin && window.parent ) {
+					rltInjectToken( currentToken, window.parent, parentOrigin );
+				}
+			}
+		} );
+
+		// listen for RLT events from approved origins
+		window.addEventListener( 'message', function( e ) {
+			var message = e && e.data;
+			if ( typeof message === 'string' ) {
+				try {
+					message = JSON.parse( message );
+				} catch ( err ) {
+					return;
+				}
+			}
+
+			var type = message && message.type;
+			var data = message && message.data;
+
+			if ( type !== 'rltMessage' ) {
+				return;
+			}
+
+			if ( data && data.event === 'invalidate' && data.token === currentToken ) {
+				rltInvalidateToken( data.token );
+			}
+		} );
+
+		if ( iframeOrigins ) {
+			if ( document.readyState !== 'loading' ) {
+				rltMonitorIframes();
+			} else {
+				window.addEventListener( 'DOMContentLoaded', rltMonitorIframes );
+			}
+		}
+
+		initializationListeners.forEach( function( listener ) {
+			listener( currentToken );
+		} );
+
+		initializationListeners = [];
+
+		hasBeenInitialized = true;
+	};
+} )();
+;
+window.__tcfapi=function(){let e=[].slice.call(arguments),t=e[0],n=e[2];"ping"===t?"function"==typeof n&&n({gdprApplies:!1,cmpLoaded:!1,cmpStatus:"stub",displayStatus:"disabled",apiVersion:"2"}):"getTCData"!==t&&"addEventListener"!==t||"function"==typeof n&&n({gdprApplies:!1,tcfPolicyVersion:2,cmpId:258,cmpVersion:1},!0)},window.addEventListener("message",(function(e){let t="string"==typeof e.data,n={};try{n=t?JSON.parse(e.data):e.data}catch(e){}let a=n.__tcfapiCall;a&&window.__tcfapi(a.command,a.version,(function(n,c){let s={__tcfapiReturn:{returnValue:n,success:c,callId:a.callId}};t&&(s=JSON.stringify(s)),e&&e.source&&e.source.postMessage&&e.source.postMessage(s,"*")}),a.parameter)}),!1),document.addEventListener("DOMContentLoaded",(function(){!function(){const e=document.createElement("iframe");e.style.cssText="display:none",e.name="__tcfapiLocator",document.body.appendChild(e)}()}));;
